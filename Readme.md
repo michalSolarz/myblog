@@ -1,0 +1,1 @@
+docker run --name myblog -e POSTGRES_USER=myblog -p 5432:5432 -d postgres
