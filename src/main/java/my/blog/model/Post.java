@@ -1,9 +1,18 @@
 package my.blog.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import my.blog.auth.model.User;
+
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "posts")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Post {
 
     @Id
@@ -11,12 +20,25 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_id_seq")
     @Column(updatable = false)
     private Long id;
+    @Column
+    private Date created = new Date();
+    @Column
+    private Date updated = new Date();
     @Column(length = 300)
     private String title;
     @Column(columnDefinition = "text")
     private String body;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonManagedReference
+    private User user;
 
     public Post() {
+    }
+
+    @PreUpdate
+    public void setLastUpdate() {
+        this.updated = new Date();
     }
 
     public Post(String title, String body) {
@@ -27,6 +49,14 @@ public class Post {
     public Long getId() {
 
         return id;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public Date getUpdated() {
+        return updated;
     }
 
     public String getTitle() {
@@ -43,6 +73,14 @@ public class Post {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
